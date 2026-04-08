@@ -1,0 +1,20 @@
+Test Case ID,Test Case Title,Module,Priority,Pre-conditions,Test Steps,Test Data,Expected Result,Actual Result,Status,Bug ID (if any)
+TC_LOGIN_01,Verify login with valid credentials,User Module,High,User is registered and on the login page,"1. Navigate to login page
+2. Enter registered email address
+3. Enter correct password
+4. Click 'Login' button",Email: user@carrental.com, Password: Pass@123,User is successfully logged in and redirected to the dashboard.,,Pass,
+TC_LOGIN_02,Verify login with invalid password,User Module,High,User is registered and on the login page,"1. Navigate to login page
+2. Enter registered email address
+3. Enter incorrect password
+4. Click 'Login' button",Email: user@carrental.com, Password: WrongPass123,An error message 'Invalid credentials' is displayed. User remains on the login page.,,Pass,
+TC_CAR_01,Verify car search by location,Search Module,Medium,User is logged in,"1. Navigate to 'Search Cars' page
+2. Enter a valid city name (e.g., 'New York')
+3. Select start date
+4. Select end date
+5. Click 'Search' button",Location: New York, Start Date: 2025-04-15, End Date: 2025-04-20,List of available cars in New York for the selected dates is displayed.,,Pass,
+TC_BOOK_01,Verify booking creation with valid data,Booking Module,Critical,User is logged in and a car is selected,"1. On car details page, click 'Book Now'
+2. Fill in personal details on the booking form
+3. Apply a valid promo code (e.g., 'SAVE10')
+4. Click 'Confirm Booking'",Name: John Doe, Phone: 9876543210, Promo: SAVE10,Booking is successful. Booking ID is generated. Total amount reflects the 10% discount.,,Fail,BUG-101
+TC_BOOK_02,Verify booking creation without selecting a car,Booking Module,High,User is logged in,"1. Navigate to 'My Bookings' page
+2. Click on 'Book a Car' without selecting any car from the list","N/A",System should redirect the user to the car search page or show an appropriate message.,,Fail,BUG-102

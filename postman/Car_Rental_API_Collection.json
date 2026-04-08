@@ -1,0 +1,364 @@
+{
+    "info": {
+        "_postman_id": "car-rental-qa-collection",
+        "name": "Car Rental API Tests - QA Project",
+        "description": "A comprehensive test suite for the Car Rental System API, including automated tests for CRUD operations, authentication, and error handling.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "https://carrental-test.com/api/v1",
+            "type": "string"
+        },
+        {
+            "key": "authToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "createdCarId",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "1. Authentication",
+            "item": [
+                {
+                    "name": "User Signup",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Aman Gadava\",\n    \"email\": \"aman.test@example.com\",\n    \"password\": \"SecurePass@123\",\n    \"phone\": \"9876543210\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/signup",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "signup"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "User Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', () => { pm.response.to.have.status(200); });",
+                                    "pm.test('Response has auth token', () => {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.token).to.be.a('string');",
+                                    "    pm.environment.set('authToken', jsonData.token);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"aman.test@example.com\",\n    \"password\": \"SecurePass@123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "2. Car Management (Authenticated)",
+            "item": [
+                {
+                    "name": "Create New Car",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201', () => { pm.response.to.have.status(201); });",
+                                    "const jsonData = pm.response.json();",
+                                    "pm.environment.set('createdCarId', jsonData.car._id);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"carNumber\": \"TEST101\",\n    \"companyName\": \"Toyota\",\n    \"model\": \"Camry\",\n    \"dailyRentalRate\": 2500\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/cars",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "cars"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Cars",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', () => { pm.response.to.have.status(200); });",
+                                    "pm.test('Response is an array', () => { pm.expect(pm.response.json()).to.be.an('array'); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/cars",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "cars"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Car by ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', () => { pm.response.to.have.status(200); });",
+                                    "const jsonData = pm.response.json();",
+                                    "pm.test('Car ID matches', () => { pm.expect(jsonData._id).to.eql(pm.environment.get('createdCarId')); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/cars/{{createdCarId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "cars",
+                                "{{createdCarId}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update a Car",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', () => { pm.response.to.have.status(200); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"dailyRentalRate\": 2700\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/cars/{{createdCarId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "cars",
+                                "{{createdCarId}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete a Car",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 204', () => { pm.response.to.have.status(204); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/cars/{{createdCarId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "cars",
+                                "{{createdCarId}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "3. Negative & Error Scenarios",
+            "item": [
+                {
+                    "name": "Get Car by Invalid ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 404', () => { pm.response.to.have.status(404); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/cars/invalidID123",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "cars",
+                                "invalidID123"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Car Without Auth Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 401', () => { pm.response.to.have.status(401); });"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"carNumber\": \"NOAUTH123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/cars",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "cars"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}
